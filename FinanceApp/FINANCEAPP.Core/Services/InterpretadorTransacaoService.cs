@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace FINANCEAPP.Core.Services
 {
+    /// <summary>
+    /// Serviço responsável por receber uma string e transcrevela em transações
+    /// </summary>
     public class InterpretadorDeTransacaoService
     {
         // Expressões Regulares (Regex) para encontrar padrões no texto
@@ -13,6 +16,11 @@ namespace FINANCEAPP.Core.Services
         private static readonly Regex _regexValor = new Regex(@"(\d+[\.,]\d{2})|(\d+)", RegexOptions.Compiled);
         private static readonly Regex _regexParcelas = new Regex(@"(\d+)x", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        /// <summary>
+        /// Lê todas as palavras de uma string e trata o texto.
+        /// </summary>
+        /// <param name="linhaDoChat">String contendo as informações de uma transação.txt.</param>
+        /// <returns>Um ResultadoOperacao contendo uma transação tratada</returns>        
         public ResultadoOperacao<Transacao> Interpretar(string linhaDoChat)
         {
             var matchLinha = _regexLinhaChat.Match(linhaDoChat);
@@ -29,7 +37,7 @@ namespace FINANCEAPP.Core.Services
             {
                 return ResultadoOperacao<Transacao>.CreateFailure("Mensagem não contém um valor monetário.");
             }
-            
+
             // --- Se a linha é válida, começamos a montar a transação ---
             var transacao = new Transacao();
 
