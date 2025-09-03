@@ -1,0 +1,94 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "FINANCEAPP.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/FINANCEAPP.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/FINANCEAPP.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "FINANCEAPP.Core/1.0.0": {
+      "type": "project",
+      "path": "../FINANCEAPP.Core/FINANCEAPP.Core.csproj",
+      "msbuildProject": "../FINANCEAPP.Core/FINANCEAPP.Core.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "FINANCEAPP.Core >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\caio.jardim\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\caio.jardim\\Desktop\\PESSOAL\\Programacao\\Projetos\\FINANCEAPP\\FinanceApp\\FINANCEAPP.Console\\FINANCEAPP.Console.csproj",
+      "projectName": "FINANCEAPP.Console",
+      "projectPath": "C:\\Users\\caio.jardim\\Desktop\\PESSOAL\\Programacao\\Projetos\\FINANCEAPP\\FinanceApp\\FINANCEAPP.Console\\FINANCEAPP.Console.csproj",
+      "packagesPath": "C:\\Users\\caio.jardim\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\caio.jardim\\Desktop\\PESSOAL\\Programacao\\Projetos\\FINANCEAPP\\FinanceApp\\FINANCEAPP.Console\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\caio.jardim\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "C:\\Users\\caio.jardim\\Desktop\\PESSOAL\\Programacao\\Projetos\\FINANCEAPP\\FinanceApp\\FINANCEAPP.Core\\FINANCEAPP.Core.csproj": {
+              "projectPath": "C:\\Users\\caio.jardim\\Desktop\\PESSOAL\\Programacao\\Projetos\\FINANCEAPP\\FinanceApp\\FINANCEAPP.Core\\FINANCEAPP.Core.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.413/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
