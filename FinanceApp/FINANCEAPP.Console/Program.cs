@@ -1,21 +1,15 @@
 ﻿// Importa os nossos modelos e serviços do projeto Core
-using System.Text.Unicode;
-using FINANCEAPP.Core.Helpers;
 using FINANCEAPP.Core.Models;
 using FINANCEAPP.Core.Services;
-using System.Text;
-using System.Globalization;
+using System.IO; // Adicione esta linha para usar Path e Directory
 
 // --- 1. Configuração ---
-// Define os caminhos dos arquivos. Mude aqui para os caminhos corretos na sua máquina.
-// Dica: Use @ antes da string para não precisar escapar as barras invertidas (ex: @"C:\Users\...")
 string caminhoArquivoEntrada = string.Empty;
 string caminhoArquivoSaida = string.Empty;
 
 Console.WriteLine("--- Iniciando Processador de Finanças ---");
 
 // --- 2. Instância dos Serviços ---
-// Cria os nossos trabalhadores especialistas
 var leitorService = new LeitorDeChatService();
 var interpretadorService = new InterpretadorDeTransacaoService();
 var escritorService = new EscritorDeRelatorioService();
@@ -23,14 +17,21 @@ var escritorService = new EscritorDeRelatorioService();
 // --- 3. Execução (Orquestração) ---
 
 // ETAPA 1: LER O ARQUIVO DE CHAT
-// VALIDA SE O DIRETO É ACESSIVEL E SE O ARQUIVO É VALIDO
+// (A sua lógica para ler o arquivo de entrada está boa, vamos mantê-la por enquanto)
 do
 {
-    Console.WriteLine("\nInforme o caminho valido de diretorio do arquivo txt: ");
-    caminhoArquivoEntrada = Console.ReadLine();
-    Console.WriteLine(caminhoArquivoEntrada);
+    Console.WriteLine("\nInforme o caminho completo do arquivo de chat (.txt):");
+    caminhoArquivoEntrada = Console.ReadLine()?.Trim('"');
 
-} while (!ValidacaoArquivoHelper.ValidarArquivo(caminhoArquivoEntrada).Sucesso);
+    if (!File.Exists(caminhoArquivoEntrada))
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Erro: O arquivo não foi encontrado no caminho especificado.");
+        Console.ResetColor();
+        caminhoArquivoEntrada = null; // Força o loop a continuar
+    }
+
+} while (string.IsNullOrEmpty(caminhoArquivoEntrada));
 
 var resultadoLeitura = leitorService.LerLinhas(caminhoArquivoEntrada);
 
@@ -39,7 +40,7 @@ if (!resultadoLeitura.Sucesso)
     Console.ForegroundColor = ConsoleColor.Red;
     Console.WriteLine($"ERRO: {resultadoLeitura.Mensagem}");
     Console.ResetColor();
-    return; // Encerra a aplicação se a leitura falhar
+    return;
 }
 
 // ETAPA 2: INTERPRETAR CADA LINHA E CRIAR A LISTA DE TRANSAÇÕES
@@ -52,10 +53,8 @@ foreach (var linha in linhas)
     var resultadoInterpretacao = interpretadorService.Interpretar(linha);
     if (resultadoInterpretacao.Sucesso)
     {
-        // Se a linha foi interpretada com sucesso, adiciona a transação à lista
         transacoes.Add(resultadoInterpretacao.Dados!);
     }
-    // Se não teve sucesso, simplesmente ignora a linha (não é uma transação válida)
 }
 
 Console.WriteLine($"{transacoes.Count} transações válidas encontradas.");
@@ -67,17 +66,30 @@ if (transacoes.Count == 0)
     return;
 }
 
+// --- LOOP CORRIGIDO PARA O CAMINHO DE SAÍDA ---
+string diretorioSaida;
 do
 {
-    Console.WriteLine("\nInforme um caminho valido de diretorio para o arquivo csv: ");
-    caminhoArquivoSaida = Console.ReadLine();
-    Console.WriteLine(caminhoArquivoSaida);
+    Console.WriteLine("\nInforme a PASTA onde você quer salvar o relatório (ex: C:\\Users\\SeuNome\\Desktop):");
+    diretorioSaida = Console.ReadLine()?.Trim('"');
 
-} while (!ValidacaoArquivoHelper.ValidarDiretorio(caminhoArquivoSaida).Sucesso);
+    // Valida se o diretório (pasta) informado realmente existe.
+    if (!Directory.Exists(diretorioSaida))
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Erro: A pasta informada não existe. Por favor, tente novamente.");
+        Console.ResetColor();
+        diretorioSaida = null; // Limpa a variável para o loop continuar
+    }
 
-caminhoArquivoSaida = Path.Combine(caminhoArquivoSaida, "relatorio_financeiro.csv");
+} while (string.IsNullOrEmpty(diretorioSaida));
 
-Console.WriteLine($"Escrevendo relatório em: {caminhoArquivoSaida}");
+// AQUI ESTÁ A CORREÇÃO: Juntamos a pasta com o nome do arquivo
+string nomeArquivo = "relatorio_financeiro.csv";
+caminhoArquivoSaida = Path.Combine(diretorioSaida, nomeArquivo);
+
+Console.WriteLine($"O relatório será salvo em: {caminhoArquivoSaida}");
+
 var resultadoEscrita = escritorService.EscreverCsv(transacoes, caminhoArquivoSaida);
 
 if (!resultadoEscrita.Sucesso)
@@ -85,7 +97,7 @@ if (!resultadoEscrita.Sucesso)
     Console.ForegroundColor = ConsoleColor.Red;
     Console.WriteLine($"ERRO: {resultadoEscrita.Mensagem}");
     Console.ResetColor();
-    return; // Encerra a aplicação se a escrita falhar
+    return;
 }
 
 // FIM: SUCESSO!

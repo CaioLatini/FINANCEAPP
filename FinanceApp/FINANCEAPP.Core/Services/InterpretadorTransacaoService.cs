@@ -2,25 +2,18 @@ using FINANCEAPP.Core.Data;
 using FINANCEAPP.Core.Helpers;
 using FINANCEAPP.Core.Models;
 using System.Globalization;
+using System.Text; // Importado para usar StringBuilder
 using System.Text.RegularExpressions;
 
 namespace FINANCEAPP.Core.Services
 {
-    /// <summary>
-    /// Serviço responsável por receber uma string e transcrevela em transações
-    /// </summary>
     public class InterpretadorDeTransacaoService
     {
-        // Expressões Regulares (Regex) para encontrar padrões no texto
+        // ... (As Regex não mudam)
         private static readonly Regex _regexLinhaChat = new Regex(@"^(\d{2}\/\d{2}\/\d{4})\s\d{2}:\d{2}\s-\s.+?:\s(.+)$", RegexOptions.Compiled);
         private static readonly Regex _regexValor = new Regex(@"(\d+[\.,]\d{2})|(\d+)", RegexOptions.Compiled);
         private static readonly Regex _regexParcelas = new Regex(@"(\d+)x", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        /// <summary>
-        /// Lê todas as palavras de uma string e trata o texto.
-        /// </summary>
-        /// <param name="linhaDoChat">String contendo as informações de uma transação.txt.</param>
-        /// <returns>Um ResultadoOperacao contendo uma transação tratada</returns>        
         public ResultadoOperacao<Transacao> Interpretar(string linhaDoChat)
         {
             var matchLinha = _regexLinhaChat.Match(linhaDoChat);
@@ -38,76 +31,72 @@ namespace FINANCEAPP.Core.Services
                 return ResultadoOperacao<Transacao>.CreateFailure("Mensagem não contém um valor monetário.");
             }
 
-            // --- Se a linha é válida, começamos a montar a transação ---
+            // --- PONTO DE MELHORIA: Limpeza da Mensagem ---
+            // Remove o texto "<Mensagem editada>" e outros ruídos.
+            mensagem = mensagem.Replace("<Mensagem editada>", "").Trim();
+
             var transacao = new Transacao();
 
             // 1. Extrair Data e Valor
-            if (DateTime.TryParse(dataString, out var data))
-            {
-                transacao.Data = data;
-            }
-            if (decimal.TryParse(matchValor.Value.Replace(",", "."), CultureInfo.InvariantCulture, out var valor))
-            {
-                transacao.Valor = valor;
-            }
+            if (DateTime.TryParse(dataString, out var data)) transacao.Data = data;
+            if (decimal.TryParse(matchValor.Value.Replace(",", "."), CultureInfo.InvariantCulture, out var valor)) transacao.Valor = valor;
+
+            var palavras = mensagem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var descricaoBuilder = new StringBuilder();
+            string? categoriaAbsoluta = null;
 
             // 2. Processar cada palavra da mensagem
-            var palavras = mensagem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var ultimaPalavraDaLista = palavras.Last();
-
             foreach (var palavra in palavras)
             {
-                // Ignora a palavra que é o próprio valor
                 if (palavra == matchValor.Value) continue;
-
-                // Identifica se é a ultima palavra 
-                bool isUltimaPalavra = (palavra == ultimaPalavraDaLista);
 
                 var palavraNormalizada = TextoHelper.Normalizar(palavra);
 
-                // 3. Identificar Tipo (Entrada/Saída), Formato e Parcelas
-                if (Dicionarios.PalavrasEntrada.Contains(palavraNormalizada))
+                // É uma palavra-chave de sistema (Tipo, Formato, Parcela)?
+                if (IsPalavraChaveSistema(palavraNormalizada, transacao))
                 {
-                    transacao.Tipo = TipoTransacao.Entrada;
-                    continue;
+                    continue; // Se for, processe e pule para a próxima palavra.
                 }
 
-                if (Dicionarios.FormatosPagamento.Contains(palavraNormalizada))
+                // É uma categoria absoluta (uma chave do dicionário)?
+                if (Dicionarios.Categorias.ContainsKey(palavraNormalizada))
                 {
-                    transacao.FormatoPagamento = palavraNormalizada;
-                    continue;
+                    categoriaAbsoluta = Dicionarios.Categorias.Keys.First(k => k.Equals(palavraNormalizada, StringComparison.OrdinalIgnoreCase));
+                    continue; // Categorias absolutas NUNCA entram na descrição.
                 }
 
-                var matchParcela = _regexParcelas.Match(palavraNormalizada);
-                if (matchParcela.Success && int.TryParse(matchParcela.Groups[1].Value, out int parcelas))
+                // É uma sub-categoria (um valor no dicionário)?
+                var categoriaEncontrada = BuscarSubCategoria(palavraNormalizada);
+                if (categoriaEncontrada != null)
                 {
-                    transacao.Parcelas = parcelas;
-                    transacao.FormatoPagamento = "credito";
-                    continue;
-                }
-
-                // 4. Identificar Categoria
-                var categoriaEncontrada = BuscarCategoria(palavraNormalizada);
-                if (!string.IsNullOrEmpty(categoriaEncontrada))
-                {
+                    // Define a categoria (pode ser sobrescrita pela absoluta depois)
                     transacao.Categoria = categoriaEncontrada;
-                    continue;
                 }
-
-                // 5. O que sobrar, vira descrição
-                transacao.Descricao += " " + palavraNormalizada;
-
-                // 6. Garante que a descrição não fique vazia
-                if (transacao.Descricao == string.Empty && isUltimaPalavra)
-                {
-                    transacao.Descricao = transacao.Categoria;
-                    continue;
-                }
+                
+                // Se a palavra não for de sistema nem uma categoria absoluta, ela faz parte da descrição.
+                descricaoBuilder.Append(palavra + " ");
             }
+
+            // 3. Define a categoria final (a absoluta tem prioridade)
+            if (categoriaAbsoluta != null)
+            {
+                transacao.Categoria = categoriaAbsoluta;
+            }
+            
+            // 4. Define a descrição final
+            transacao.Descricao = descricaoBuilder.ToString().Trim();
+
+            // 5. Garante que a descrição não fique vazia
+            if (string.IsNullOrWhiteSpace(transacao.Descricao))
+            {
+                transacao.Descricao = transacao.Categoria;
+            }
+
             return ResultadoOperacao<Transacao>.CreateSuccess(transacao);
         }
 
-        private string? BuscarCategoria(string palavraNormalizada)
+        // Renomeado para maior clareza, busca apenas nos VALORES
+        private string? BuscarSubCategoria(string palavraNormalizada)
         {
             foreach (var parCategoria in Dicionarios.Categorias)
             {
@@ -117,6 +106,31 @@ namespace FINANCEAPP.Core.Services
                 }
             }
             return null;
+        }
+
+        private bool IsPalavraChaveSistema(string palavraNormalizada, Transacao transacao)
+        {
+            if (Dicionarios.PalavrasEntrada.Contains(palavraNormalizada))
+            {
+                transacao.Tipo = TipoTransacao.Entrada;
+                return true;
+            }
+
+            if (Dicionarios.FormatosPagamento.Contains(palavraNormalizada))
+            {
+                transacao.FormatoPagamento = palavraNormalizada;
+                return true;
+            }
+
+            var matchParcela = _regexParcelas.Match(palavraNormalizada);
+            if (matchParcela.Success && int.TryParse(matchParcela.Groups[1].Value, out int parcelas))
+            {
+                transacao.Parcelas = parcelas;
+                transacao.FormatoPagamento = "credito";
+                return true;
+            }
+            
+            return false;
         }
     }
 }
