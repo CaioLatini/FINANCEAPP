@@ -1,7 +1,10 @@
 ﻿// Importa os nossos modelos e serviços do projeto Core
+using System.Text.Unicode;
 using FINANCEAPP.Core.Helpers;
 using FINANCEAPP.Core.Models;
 using FINANCEAPP.Core.Services;
+using System.Text;
+using System.Globalization;
 
 // --- 1. Configuração ---
 // Define os caminhos dos arquivos. Mude aqui para os caminhos corretos na sua máquina.
@@ -23,11 +26,11 @@ var escritorService = new EscritorDeRelatorioService();
 // VALIDA SE O DIRETO É ACESSIVEL E SE O ARQUIVO É VALIDO
 do
 {
-    Console.WriteLine("\nInforme o caminho de diretorio do arquivo txt: ");
+    Console.WriteLine("\nInforme o caminho valido de diretorio do arquivo txt: ");
     caminhoArquivoEntrada = Console.ReadLine();
+    Console.WriteLine(caminhoArquivoEntrada);
 
-} while (ValidacaoArquivoHelper.ValidarDiretorio(caminhoArquivoEntrada).Sucesso &&
-        ValidacaoArquivoHelper.ValidarArquivo(caminhoArquivoEntrada).Sucesso);
+} while (!ValidacaoArquivoHelper.ValidarArquivo(caminhoArquivoEntrada).Sucesso);
 
 var resultadoLeitura = leitorService.LerLinhas(caminhoArquivoEntrada);
 
@@ -63,6 +66,16 @@ if (transacoes.Count == 0)
     Console.WriteLine("Nenhuma transação para exportar. Encerrando.");
     return;
 }
+
+do
+{
+    Console.WriteLine("\nInforme um caminho valido de diretorio para o arquivo csv: ");
+    caminhoArquivoSaida = Console.ReadLine();
+    Console.WriteLine(caminhoArquivoSaida);
+
+} while (!ValidacaoArquivoHelper.ValidarDiretorio(caminhoArquivoSaida).Sucesso);
+
+caminhoArquivoSaida = Path.Combine(caminhoArquivoSaida, "relatorio_financeiro.csv");
 
 Console.WriteLine($"Escrevendo relatório em: {caminhoArquivoSaida}");
 var resultadoEscrita = escritorService.EscreverCsv(transacoes, caminhoArquivoSaida);

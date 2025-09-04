@@ -16,12 +16,13 @@ namespace FINANCEAPP.Core.Helpers
         /// <returns>ResultadoOperacao confirmando o diretorio</returns>
         public static ResultadoOperacao<bool> ValidarDiretorio(string caminhoArquivo)
         {
-            if (!File.Exists(caminhoArquivo))
+            if (!Directory.Exists(caminhoArquivo))
             {
                 return ResultadoOperacao<bool>.CreateFailure("Diretorio não encontrado");
             }
             return ResultadoOperacao<bool>.CreateSuccess(true, "Diretorio válido");
         }
+        
         /// <summary>
         /// Lê todas as linhas de um arquivo de texto.
         /// </summary>

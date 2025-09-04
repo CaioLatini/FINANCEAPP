@@ -1,0 +1,12 @@
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\bin\Debug\net8.0\FINANCEAPP.Core.deps.json
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\bin\Debug\net8.0\FINANCEAPP.Core.dll
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\bin\Debug\net8.0\FINANCEAPP.Core.pdb
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.AssemblyInfoInputs.cache
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.AssemblyInfo.cs
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.csproj.CoreCompileInputs.cache
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.sourcelink.json
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.dll
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\refint\FINANCEAPP.Core.dll
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\FINANCEAPP.Core.pdb
+C:\Users\caio.jardim\Desktop\PESSOAL\Programacao\Projetos\FINANCEAPP\FinanceApp\FINANCEAPP.Core\obj\Debug\net8.0\ref\FINANCEAPP.Core.dll
